@@ -61,11 +61,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { API } from '@/config.js'
 
 const route = useRoute()
 const router = useRouter()
 
-const API = 'http://localhost:8088/api'
 const USER_ID = 'test-user-id' // 나중에 로그인 기능으로 교체
 
 const place = ref({})

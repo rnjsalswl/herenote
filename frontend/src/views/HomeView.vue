@@ -22,13 +22,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { API } from '@/config.js'
 
 const router = useRouter()
 const places = ref([])
 const loading = ref(true)
 
 onMounted(async () => {
-  const res = await fetch('http://localhost:8088/api/places')
+  const res = await fetch(`${API}/places`)
   const data = await res.json()
   places.value = data.places
   loading.value = false
