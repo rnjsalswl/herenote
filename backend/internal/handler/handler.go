@@ -2,6 +2,7 @@ package handler
 
 import (
     "net/http"
+    "fmt"
 
     "github.com/gin-gonic/gin"
     "github.com/herenote/backend/internal/model"
@@ -77,6 +78,28 @@ func (h *PlaceHandler) Create(c *gin.Context) {
     c.JSON(http.StatusCreated, place)
 }
 
+// GET /api/places/nearby?lat=&lng={
+func (h *PlaceHandler) Nearby(c *gin.Context) {
+    lat := c.Query("lat")
+    lng := c.Query("lng")
+
+    if lat == "" || lng == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "lat, lng 파라미터가 필요합니다"})
+        return
+    }
+
+    var latF, lngF float64
+    fmt.Sscanf(lat, "%f", &latF)
+    fmt.Sscanf(lng, "%f", &lngF)
+
+    places, err := h.svc.FindNearby(c.Request.Context(), latF, lngF)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"places": places})
+}
+
 // 방명록
 type GuestbookHandler struct { svc *service.GuestbookService }
 
@@ -112,6 +135,16 @@ func (h *GuestbookHandler) Create(c *gin.Context) {
         return
     }
     c.JSON(http.StatusCreated, gb)
+}
+
+// GET /api/users/:id/guestbooks/places
+func (h *GuestbookHandler) MyPlaces(c *gin.Context) {
+    places, err := h.svc.MyPlaces(c.Request.Context(), c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"places": places})
 }
 
 // 유저

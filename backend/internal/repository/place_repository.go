@@ -65,6 +65,44 @@ func (r *PlaceRepository) FindByID(ctx context.Context, id string) (*model.Place
     return &p, nil
 }
 
+// 현재 위치 근처 장소 조회(500m 이내)
+func (r *PlaceRepository) FindNearby(ctx context.Context, lat, lng float64) ([]model.Place, error) {
+    rows, err := r.db.Query(ctx, `
+        SELECT id, name, description,
+               ST_Y(location::geometry) AS latitude,
+               ST_X(location::geometry) AS longitude,
+               radius_meters, created_at
+        FROM places
+        WHERE ST_DWithin(
+            location::geography,
+            ST_MakePoint($2, $1)::geography,
+            500
+        )
+        ORDER BY ST_Distance(
+            location::geography,
+            ST_MakePoint($2, $1)::geography
+        )
+    `, lat, lng)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var places []model.Place
+    for rows.Next() {
+        var p model.Place
+        if err := rows.Scan(
+            &p.ID, &p.Name, &p.Description,
+            &p.Latitude, &p.Longitude,
+            &p.RadiusMeters, &p.CreatedAt,
+        ); err != nil {
+            return nil, err
+        }
+        places = append(places, p)
+    }
+    return places, nil
+}
+
 // GPS 위치 인증 - PostGIS 핵심 쿼리
 func (r *PlaceRepository) VerifyLocation(ctx context.Context, placeID string, lat, lng float64) (bool, error) {
     var verified bool
