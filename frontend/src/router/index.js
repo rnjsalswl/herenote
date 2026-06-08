@@ -14,6 +14,11 @@ const router = createRouter({
       name: 'place',
       component: () => import('../views/PlaceView.vue'),
     },
+    {
+      path: '/add-place',
+      name: 'add-place',
+      component: () => import('../views/AddPlaceView.vue'),
+    },
   ],
 })
 
