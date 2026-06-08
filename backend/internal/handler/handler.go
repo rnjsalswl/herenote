@@ -194,3 +194,22 @@ func (h *UserHandler) GrantBadge(c *gin.Context) {
     }
     c.JSON(http.StatusOK, gin.H{"message": "뱃지가 부여되었습니다."})
 }
+
+// POST /api/auth/login
+func (h *UserHandler) Login(c *gin.Context) {
+    var req model.LoginRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    user, err := h.svc.Login(c.Request.Context(), &req)
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, model.LoginResponse{
+        UserID:    user.ID,
+        Nickname:  user.Nickname,
+        BadgeType: user.BadgeType,
+    })
+}

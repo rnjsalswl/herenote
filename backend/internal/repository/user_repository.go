@@ -15,16 +15,30 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
     return &UserRepository{db: db}
 }
 
-func (r *UserRepository) Create(ctx context.Context, req *model.CreateUserRequest) (*model.User, error) {
+func (r *UserRepository) Create(ctx context.Context, req *model.CreateUserRequest, passwordHash string) (*model.User, error) {
     var u model.User
     err := r.db.QueryRow(ctx, `
-        INSERT INTO users (nickname)
-        VALUES ($1)
+        INSERT INTO users (nickname, password_hash)
+        VALUES ($1, $2)
         RETURNING id, nickname, badge_type, created_at
-    `, req.Nickname).Scan(&u.ID, &u.Nickname, &u.BadgeType, &u.CreatedAt)
+    `, req.Nickname, passwordHash).Scan(&u.ID, &u.Nickname, &u.BadgeType, &u.CreatedAt)
     if err != nil {
         return nil, err
     }
+    return &u, nil
+}
+
+func (r *UserRepository) FindByNickname(ctx context.Context, nickname string) (*model.User, error) {
+    var u model.User
+    var passwordHash string
+    err := r.db.QueryRow(ctx, `
+        SELECT id, nickname, badge_type, created_at, COALESCE(password_hash, '')
+        FROM users WHERE nickname = $1
+    `, nickname).Scan(&u.ID, &u.Nickname, &u.BadgeType, &u.CreatedAt, &passwordHash)
+    if err != nil {
+        return nil, err
+    }
+    u.PasswordHash = passwordHash
     return &u, nil
 }
 

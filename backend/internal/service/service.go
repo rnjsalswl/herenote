@@ -8,6 +8,7 @@ import (
     "github.com/google/uuid"
     "github.com/herenote/backend/internal/model"
     "github.com/herenote/backend/internal/repository"
+    "golang.org/x/crypto/bcrypt"
 )
 
 // 위치 인증
@@ -108,8 +109,42 @@ func NewUserService(r *repository.UserRepository) *UserService {
     return &UserService{repo: r}
 }
 
-func (s *UserService) Create(ctx context.Context, req *model.CreateUserRequest) (*model.User, error) {
-    return s.repo.Create(ctx, req)
+func (s *UserService) Create(ctx context.Context, req *model.CreateUserRequest) (*model.AuthResponse, error) {
+    // 비밀번호 암호화
+    hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+    if err != nil {
+        return nil, err
+    }
+
+    user, err := s.repo.Create(ctx, req, string(hash))
+    if err != nil {
+        return nil, err
+    }
+
+    return &model.AuthResponse{
+        ID: user.ID,
+        Nickname: user.Nickname,
+        BadgeType: user.BadgeType,
+        Token: user.ID, // JWT 교체 예정
+    }, nil
+}
+
+func (s *UserService) Login(ctx context.Context, req *model.LoginRequest) (*model.AuthResponse, error) {
+    user, err := s.repo.FindByNickname(ctx, req.Nickname)
+    if err != nil {
+        return nil, fmt.Errorf("닉네임 또는 비밀번호가 올바르지 않습니다.")
+    }
+
+    if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+        return nil, fmt.Errorf("닉네임 또는 비밀번호가 올바르지 않습니다.")
+    }
+
+    return &model.AuthResponse{
+        ID: user.ID,
+        Nickname: user.Nickname,
+        BadgeType: user.BadgeType,
+        Token: user.ID,
+    }, nil
 }
 
 func (s *UserService) Get(ctx context.Context, id string) (*model.User, error) {
