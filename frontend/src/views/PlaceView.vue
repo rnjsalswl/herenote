@@ -62,11 +62,12 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { API } from '@/config.js'
+import { getUserID } from '@/stores/user.js'
 
 const route = useRoute()
 const router = useRouter()
 
-const USER_ID = 'test-user-id' // 나중에 로그인 기능으로 교체
+const USER_ID = getUserID()
 
 const place = ref({})
 const loading = ref(true)
