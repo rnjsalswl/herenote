@@ -1,4 +1,7 @@
 <template>
+<button class="add-btn" @click="router.push('/add-place')">
+  + 장소 추가
+</button>
   <div class="home">
     <h1>HERE : NOTE</h1>
     <p>장소를 선택해서 방명록을 확인하세요</p>
@@ -69,5 +72,16 @@ h1 {
 .radius {
   font-size: 12px;
   color: #888;
+}
+
+.add-btn {
+  background: #1A4FA0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 16px;
 }
 </style>
