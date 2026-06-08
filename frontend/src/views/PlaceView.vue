@@ -103,8 +103,6 @@ async function verify() {
       })
       const data = await res.json()
 
-      alert(JSON.stringify(data))  // 임시 추가
-
       if (data.verified) {
         verified.value = true
         token.value = data.token
