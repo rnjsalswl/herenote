@@ -106,7 +106,7 @@ async function verify() {
       if (data.verified) {
         verified.value = true
         token.value = data.token
-        loadGuestbooks()
+        await loadGuestbooks()
       } else {
         verifyError.value = data.message
       }
@@ -121,11 +121,16 @@ async function verify() {
 
 // 방명록 목록
 async function loadGuestbooks() {
-  const res = await fetch(`${API}/places/${route.params.id}/guestbooks`, {
-    headers: { 'X-Location-Token': token.value },
-  })
-  const data = await res.json()
-  guestbooks.value = data.guestbooks
+  try {
+      const res = await fetch(`${API}/places/${route.params.id}/guestbooks`, {
+        headers: { 'X-Location-Token': token.value },
+      })
+      const data = await res.json()
+      guestbooks.value = data.guestbooks || []
+    } catch (e) {
+      console.log('방명록 로드 실패:', e)
+      guestbooks.value = []
+    }
 }
 
 // 방명록 작성
