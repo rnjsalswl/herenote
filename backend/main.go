@@ -72,6 +72,7 @@ func main() {
         // 유저
         api.POST("/users", userHandler.Create)
         api.GET("/users/:id", userHandler.Get)
+        api.POST("/auth/login",  userHandler.Login)
 
         // 어드민
         admin := api.Group("/admin")

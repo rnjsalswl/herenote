@@ -35,11 +35,31 @@ type User struct {
     ID string `json:"id"`
     Nickname string `json:"nickname"`
     BadgeType BadgeType `json:"badge_type"`
+    PasswordHash string `json:"-"`  // json 응답에서 숨김
     CreatedAt time.Time `json:"created_at"`
 }
 
 type CreateUserRequest struct {
-    Nickname string `json:"nickname"    binding:"required"`
+    Nickname string `json:"nickname" binding:"required"`
+    Password string `json:"password" binding:"required,min=4"`
+}
+
+type LoginRequest struct {
+    Nickname string `json:"nickname" binding:"required"`
+    Password string `json:"password" binding:"required"`
+}
+
+type LoginResponse struct {
+    UserID string `json:"user_id"`
+    Nickname string `json:"nickname"`
+    BadgeType BadgeType `json:"badge_type"`
+}
+
+type AuthResponse struct {
+    ID string `json:"id"`
+    Nickname string `json:"nickname"`
+    BadgeType BadgeType `json:"badge_type"`
+    Token string `json:"token"` // JWT 교체 예정
 }
 
 // 방명록
