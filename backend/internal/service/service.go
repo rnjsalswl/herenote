@@ -71,6 +71,10 @@ func (s *PlaceService) Create(ctx context.Context, req *model.CreatePlaceRequest
     return s.repo.Create(ctx, req)
 }
 
+func (s *PlaceService) FindNearby(ctx context.Context, lat, lng float64) ([]model.Place, error) {
+    return s.repo.FindNearby(ctx, lat, lng)
+}
+
 // 방명록
 type GuestbookService struct {
     repo *repository.GuestbookRepository
@@ -89,6 +93,10 @@ func (s *GuestbookService) Create(ctx context.Context, placeID, userID string, r
     // 뱃지 보유자는 자동 상단 고정
     isPinned := badgeType != model.BadgeNone
     return s.repo.Create(ctx, placeID, userID, req, isPinned)
+}
+
+func (s *GuestbookService) MyPlaces(ctx context.Context, userID string) ([]model.Place, error) {
+    return s.repo.FindMyPlaces(ctx, userID)
 }
 
 // 유저

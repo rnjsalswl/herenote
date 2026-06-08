@@ -67,3 +67,36 @@ func (r *GuestbookRepository) Create(ctx context.Context, placeID, userID string
     }
     return &g, nil
 }
+
+// 내가 작성한 방명록의 장소 목록 (최근순, 장소 중복 제거)
+func (r *GuestbookRepository) FindMyPlaces(ctx context.Context, userID string) ([]model.Place, error) {
+    rows, err := r.db.Query(ctx, `
+        SELECT DISTINCT ON (p.id)
+               p.id, p.name, p.description,
+               ST_Y(p.location::geometry) AS latitude,
+               ST_X(p.location::geometry) AS longitude,
+               p.radius_meters, p.created_at
+        FROM guestbooks g
+        JOIN places p ON g.place_id = p.id
+        WHERE g.user_id = $1
+        ORDER BY p.id, g.created_at DESC
+    `, userID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var places []model.Place
+    for rows.Next() {
+        var p model.Place
+        if err := rows.Scan(
+            &p.ID, &p.Name, &p.Description,
+            &p.Latitude, &p.Longitude,
+            &p.RadiusMeters, &p.CreatedAt,
+        ); err != nil {
+            return nil, err
+        }
+        places = append(places, p)
+    }
+    return places, nil
+}

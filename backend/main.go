@@ -58,6 +58,7 @@ func main() {
         // 장소
         api.GET("/places", placeHandler.List)
         api.GET("/places/:id", placeHandler.Get)
+        api.GET("/places/nearby", placeHandler.Nearby)
 
         // 방명록 - 위치 인증 필요
         auth := api.Group("/places/:id/guestbooks")
@@ -66,6 +67,7 @@ func main() {
             auth.GET("", guestbookHandler.List)
             auth.POST("", guestbookHandler.Create)
         }
+        api.GET("/users/:id/guestbooks/places", guestbookHandler.MyPlaces)
 
         // 유저
         api.POST("/users", userHandler.Create)
