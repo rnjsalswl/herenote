@@ -93,7 +93,7 @@ func (r *PlaceRepository) Create(ctx context.Context, req *model.CreatePlaceRequ
     err := r.db.QueryRow(ctx, `
         INSERT INTO places (name, description, location, radius_meters)
         VALUES ($1, $2, ST_MakePoint($4, $3)::geography, $5)
-        RETRUNING id, name, description,
+        RETURNING id, name, description,
                   ST_Y(location::geometry),
                   ST_X(location::geometry),
                   radius_meters, created_at
