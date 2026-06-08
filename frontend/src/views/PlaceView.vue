@@ -104,9 +104,12 @@ async function verify() {
       const data = await res.json()
 
       if (data.verified) {
+        alert('인증 성공')
         verified.value = true
         token.value = data.token
+        alert('토큰 저장 성공')
         await loadGuestbooks()
+        alert('방명록 로드 성공')
       } else {
         verifyError.value = data.message
       }
