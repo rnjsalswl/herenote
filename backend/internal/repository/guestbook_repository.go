@@ -68,6 +68,39 @@ func (r *GuestbookRepository) Create(ctx context.Context, placeID, userID string
     return &g, nil
 }
 
+// 특정 장소에서 특정 유저가 쓴 방명록
+func (r *GuestbookRepository) FindByUserAndPlace(ctx context.Context, userID, placeID string) ([]model.Guestbook, error) {
+    rows, err := r.db.Query(ctx, `
+        SELECT g.id, g.place_id, g.user_id,
+               u.nickname, u.badge_type,
+               g.content, COALESCE(g.image_url, ''),
+               g.is_pinned, g.created_at
+        FROM guestbooks g
+        JOIN users u ON g.user_id = u.id
+        WHERE g.place_id = $1 AND g.user_id = $2
+        ORDER BY g.created_at DESC
+    `, placeID, userID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var list []model.Guestbook
+    for rows.Next() {
+        var g model.Guestbook
+        if err := rows.Scan(
+            &g.ID, &g.PlaceID, &g.UserID,
+            &g.Nickname, &g.BadgeType,
+            &g.Content, &g.ImageURL,
+            &g.IsPinned, &g.CreatedAt,
+        ); err != nil {
+            return nil, err
+        }
+        list = append(list, g)
+    }
+    return list, nil
+}
+
 // 내가 작성한 방명록의 장소 목록 (최근순, 장소 중복 제거)
 func (r *GuestbookRepository) FindMyPlaces(ctx context.Context, userID string) ([]model.Place, error) {
     rows, err := r.db.Query(ctx, `
