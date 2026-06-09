@@ -1,54 +1,71 @@
 <template>
-  <div class="home">
-    <!-- 헤더 -->
-    <div class="header">
-      <h1>HERE : NOTE</h1>
-      <div class="header-actions">
-        <button class="add-btn" @click="router.push('/add-place')">+ 장소</button>
-        <button class="logout-btn" @click="logout">로그아웃</button>
+  <div class="page">
+    <header class="topbar">
+      <span class="topbar-title">HERE NOTE</span>
+      <div class="topbar-actions">
+        <button class="icon-btn" @click="router.push('/add-place')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+        <button class="icon-btn" @click="logout">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
       </div>
-    </div>
+    </header>
 
-    <!-- 현재 위치 근처 장소 -->
-    <div class="section">
-      <h2>📍 지금 여기</h2>
-      <div v-if="locating" class="loading">위치 확인 중...</div>
-      <div v-else-if="nearbyPlaces.length > 0">
+    <!-- 지금 여기 -->
+    <section>
+      <p class="section-label">지금 여기</p>
+      <div v-if="locating" class="state-msg">위치 확인 중...</div>
+      <template v-else-if="nearbyPlaces.length > 0">
         <RouterLink
           v-for="place in nearbyPlaces"
           :key="place.id"
           :to="`/places/${place.id}`"
-          class="place-card nearby"
+          class="row"
         >
-          <div class="place-info">
-            <span class="place-name">{{ place.name }}</span>
-            <span class="place-desc">{{ place.description }}</span>
+          <div class="row-icon">📍</div>
+          <div class="row-body">
+            <span class="row-name">{{ place.name }}</span>
+            <span class="row-desc">{{ place.description }}</span>
+            <span class="row-meta">반경 {{ place.radius_meters }}m</span>
           </div>
-          <span class="arrow">→</span>
+          <svg class="row-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
         </RouterLink>
-      </div>
-      <div v-else class="empty">근처에 등록된 장소가 없어요</div>
-    </div>
+      </template>
+      <div v-else class="state-msg">근처에 등록된 장소가 없어요</div>
+    </section>
 
-    <!-- 내가 다녀간 장소 -->
-    <div class="section">
-      <h2>🗺 내가 다녀간 곳</h2>
-      <div v-if="myPlaces.length > 0">
+    <div class="block-sep" />
+
+    <!-- 내가 다녀간 곳 -->
+    <section>
+      <p class="section-label">내가 다녀간 곳</p>
+      <template v-if="myPlaces.length > 0">
         <RouterLink
           v-for="place in myPlaces"
           :key="place.id"
           :to="{ path: `/places/${place.id}`, query: { mine: 'true' } }"
-          class="place-card"
+          class="row"
         >
-          <div class="place-info">
-            <span class="place-name">{{ place.name }}</span>
-            <span class="place-desc">{{ place.description }}</span>
+          <div class="row-icon">🗺️</div>
+          <div class="row-body">
+            <span class="row-name">{{ place.name }}</span>
+            <span class="row-desc">{{ place.description }}</span>
           </div>
-          <span class="arrow">→</span>
+          <svg class="row-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
         </RouterLink>
-      </div>
-      <div v-else class="empty">아직 방명록을 남긴 장소가 없어요</div>
-    </div>
+      </template>
+      <div v-else class="state-msg">아직 방명록을 남긴 장소가 없어요</div>
+    </section>
   </div>
 </template>
 
@@ -64,7 +81,6 @@ const myPlaces = ref([])
 const locating = ref(true)
 
 onMounted(async () => {
-  // 내가 다녀간 장소 로드
   const userID = getUserID()
   if (userID) {
     try {
@@ -73,8 +89,6 @@ onMounted(async () => {
       myPlaces.value = data.places || []
     } catch {}
   }
-
-  // 현재 위치 근처 장소 조회
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
       try {
@@ -85,9 +99,7 @@ onMounted(async () => {
       } catch {}
       locating.value = false
     },
-    () => {
-      locating.value = false
-    }
+    () => { locating.value = false }
   )
 })
 
@@ -98,103 +110,130 @@ function logout() {
 </script>
 
 <style scoped>
-.home {
+.page {
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px;
+  min-height: 100vh;
+  background: #fff;
 }
-.header {
+
+/* 탑바 */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--separator);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  padding: 10px 16px;
+  height: 52px;
 }
-h1 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #1A4FA0;
+
+.topbar-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
-.header-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.add-btn {
-  background: #1A4FA0;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-}
-.logout-btn {
+
+.topbar-actions { display: flex; gap: 2px; }
+
+.icon-btn {
   background: none;
-  color: #888;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  cursor: pointer;
-}
-.logout-btn:hover {
-  background: #f5f5f5;
-}
-.section {
-  margin-bottom: 32px;
-}
-h2 {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 12px;
-}
-.place-card {
+  border: none;
+  width: 36px;
+  height: 36px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-primary);
+  transition: background 0.1s;
+}
+
+.icon-btn:active { background: var(--primary-light); }
+
+/* 섹션 */
+.section-label {
+  padding: 18px 16px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.block-sep {
+  height: 8px;
+  background: var(--primary-light);
+  border-top: 1px solid var(--separator);
+  border-bottom: 1px solid var(--separator);
+}
+
+/* 장소 row */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--separator);
   text-decoration: none;
   color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.row:active { background: var(--primary-light); }
+
+.row-icon {
+  width: 42px;
+  height: 42px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: background 0.15s;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
 }
-.place-card:hover {
-  background: #f5f5f5;
-}
-.place-card.nearby {
-  border-color: #1A4FA0;
-  background: #f0f4ff;
-}
-.place-info {
+
+.row-body {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
-.place-name {
+
+.row-name {
   font-size: 15px;
-  font-weight: 500;
-  color: #1A1A2E;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.place-desc {
+
+.row-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-meta {
   font-size: 12px;
-  color: #888;
+  color: var(--text-hint);
+  margin-top: 2px;
 }
-.arrow {
-  color: #1A4FA0;
-  font-size: 18px;
-}
-.empty {
-  color: #aaa;
+
+.row-chev { color: var(--text-hint); flex-shrink: 0; }
+
+.state-msg {
+  padding: 16px 16px;
   font-size: 14px;
-  padding: 16px 0;
-}
-.loading {
-  color: #888;
-  font-size: 14px;
-  padding: 16px 0;
+  color: var(--text-secondary);
 }
 </style>

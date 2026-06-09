@@ -1,111 +1,90 @@
 <template>
-  <div class="add-page">
-    <!-- 헤더 -->
-    <header class="page-header">
-      <div class="header-inner">
-        <button class="btn-back" @click="router.push('/')">
-          <span class="back-arrow">←</span> 뒤로
-        </button>
-        <span class="header-title">장소 추가</span>
-        <div style="width: 52px;"></div>
-      </div>
+  <div class="page">
+    <header class="topbar">
+      <button class="back-btn" @click="router.push('/')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <span class="topbar-title">장소 추가</span>
+      <div style="width:36px" />
     </header>
 
     <div class="content">
-      <!-- STEP 1: 위치 -->
+      <!-- STEP 1 -->
       <div class="step">
-        <div class="step-label">
-          <span class="step-number" :class="{ done: !!location }">
-            {{ location ? '✓' : '1' }}
-          </span>
-          <span class="step-title">현재 위치 가져오기</span>
+        <div class="step-head">
+          <div class="step-num" :class="{ done: !!location }">{{ location ? '✓' : '1' }}</div>
+          <span class="step-label">현재 위치 가져오기</span>
         </div>
 
-        <div class="location-card" :class="{ 'has-location': !!location }">
-          <div v-if="!location">
-            <p class="location-hint">장소 좌표로 현재 위치가 등록돼요</p>
-            <button class="btn-location" @click="getLocation" :disabled="locating">
-              {{ locating ? '위치 가져오는 중...' : '📍 현재 위치 가져오기' }}
+        <div class="step-body">
+          <div v-if="!location" class="loc-empty">
+            <p class="loc-hint">버튼을 눌러 현재 위치를 장소 좌표로 등록하세요</p>
+            <button class="btn-loc" @click="getLocation" :disabled="locating">
+              {{ locating ? '가져오는 중...' : '📍 현재 위치 가져오기' }}
             </button>
-            <p v-if="locationError" class="error-msg">{{ locationError }}</p>
+            <p v-if="locationError" class="err">{{ locationError }}</p>
           </div>
-          <div v-else class="location-result">
-            <div class="location-row">
-              <span class="location-label">위도</span>
-              <span class="location-value">{{ location.latitude.toFixed(6) }}</span>
+
+          <div v-else class="loc-result">
+            <div class="loc-row">
+              <span class="loc-key">위도</span>
+              <span class="loc-val">{{ location.latitude.toFixed(6) }}</span>
             </div>
-            <div class="location-row">
-              <span class="location-label">경도</span>
-              <span class="location-value">{{ location.longitude.toFixed(6) }}</span>
+            <div class="loc-row">
+              <span class="loc-key">경도</span>
+              <span class="loc-val">{{ location.longitude.toFixed(6) }}</span>
             </div>
-            <p class="location-ok">✓ 위치 정보가 준비됐어요</p>
-            <button class="btn-relocate" @click="getLocation" :disabled="locating">
-              다시 가져오기
-            </button>
+            <div class="loc-ok">✓ 위치 준비됨</div>
+            <button class="btn-relo" @click="getLocation" :disabled="locating">다시 가져오기</button>
           </div>
         </div>
       </div>
 
-      <!-- STEP 2: 장소 정보 -->
+      <div class="line-sep" />
+
+      <!-- STEP 2 -->
       <div class="step" :class="{ disabled: !location }">
-        <div class="step-label">
-          <span class="step-number">2</span>
-          <span class="step-title">장소 정보 입력</span>
+        <div class="step-head">
+          <div class="step-num">2</div>
+          <span class="step-label">장소 정보 입력</span>
         </div>
 
-        <div v-if="location" class="form-card">
-          <div class="field">
-            <label class="field-label">장소 이름 <span class="required">*</span></label>
-            <input
-              v-model="form.name"
-              class="input"
-              placeholder="예: 경복궁 정문"
-            />
+        <div class="step-body" v-if="location">
+          <div class="field-group">
+            <label class="field-label">장소 이름 <span class="req">*</span></label>
+            <input v-model="form.name" class="field" placeholder="예: 경복궁 정문" />
           </div>
 
-          <div class="field">
+          <div class="field-group">
             <label class="field-label">장소 설명</label>
-            <textarea
-              v-model="form.description"
-              class="textarea"
-              placeholder="이 장소에 대해 설명해주세요"
-            />
+            <textarea v-model="form.description" class="field ta" placeholder="이 장소에 대해 설명해주세요" />
           </div>
 
-          <div class="field">
+          <div class="field-group">
             <label class="field-label">인증 반경</label>
-            <div class="radius-options">
+            <div class="radius-grid">
               <label
                 v-for="opt in radiusOptions"
                 :key="opt.value"
-                class="radius-option"
+                class="radius-opt"
                 :class="{ selected: form.radius_meters === opt.value }"
               >
-                <input
-                  type="radio"
-                  :value="opt.value"
-                  v-model="form.radius_meters"
-                  style="display: none;"
-                />
-                <span class="radius-name">{{ opt.label }}</span>
-                <span class="radius-desc">{{ opt.desc }}</span>
+                <input type="radio" :value="opt.value" v-model="form.radius_meters" style="display:none" />
+                <span class="r-label">{{ opt.label }}</span>
+                <span class="r-desc">{{ opt.desc }}</span>
               </label>
             </div>
           </div>
 
-          <button
-            class="btn-submit"
-            @click="submit"
-            :disabled="submitting || !form.name.trim()"
-          >
+          <button class="btn-submit" @click="submit" :disabled="submitting || !form.name.trim()">
             {{ submitting ? '등록 중...' : '장소 등록하기' }}
           </button>
-          <p v-if="submitError" class="error-msg">{{ submitError }}</p>
+          <p v-if="submitError" class="err">{{ submitError }}</p>
         </div>
 
-        <div v-else class="step-placeholder">
-          위치를 먼저 가져오면 장소 정보를 입력할 수 있어요
-        </div>
+        <div v-else class="step-placeholder">위치를 먼저 가져와주세요</div>
       </div>
     </div>
   </div>
@@ -130,29 +109,20 @@ const radiusOptions = [
   { value: 500, label: '500m', desc: '산 정상' },
 ]
 
-const form = ref({
-  name: '',
-  description: '',
-  radius_meters: 100,
-})
-
+const form = ref({ name: '', description: '', radius_meters: 100 })
 const submitting = ref(false)
 const submitError = ref('')
 
 function getLocation() {
   locating.value = true
   locationError.value = ''
-
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      location.value = {
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-      }
+      location.value = { latitude: pos.coords.latitude, longitude: pos.coords.longitude }
       locating.value = false
     },
     () => {
-      locationError.value = '위치 정보를 가져올 수 없습니다. 위치 권한을 허용해주세요.'
+      locationError.value = '위치 권한을 허용해주세요.'
       locating.value = false
     }
   )
@@ -161,13 +131,9 @@ function getLocation() {
 async function submit() {
   submitting.value = true
   submitError.value = ''
-
   const res = await fetch(`${API}/admin/places`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Admin-Secret': ADMIN_SECRET,
-    },
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET },
     body: JSON.stringify({
       name: form.value.name,
       description: form.value.description,
@@ -176,7 +142,6 @@ async function submit() {
       radius_meters: form.value.radius_meters,
     }),
   })
-
   if (res.ok) {
     router.push('/')
   } else {
@@ -187,86 +152,74 @@ async function submit() {
 </script>
 
 <style scoped>
-.add-page {
+.page {
+  max-width: 600px;
+  margin: 0 auto;
   min-height: 100vh;
-  background: var(--bg);
+  background: #fff;
 }
 
-/* 헤더 */
-.page-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+.topbar {
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: var(--shadow-sm);
-}
-
-.header-inner {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--separator);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 8px;
+  height: 52px;
 }
 
-.btn-back {
+.back-btn {
   background: none;
   border: none;
-  font-size: 14px;
-  color: var(--primary);
-  font-weight: 600;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 0;
-}
-
-.back-arrow {
-  font-size: 18px;
-}
-
-.header-title {
-  font-size: 16px;
-  font-weight: 700;
+  justify-content: center;
+  border-radius: 50%;
   color: var(--text-primary);
 }
 
-/* 본문 */
-.content {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 24px 20px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.back-btn:active { background: var(--primary-light); }
+
+.topbar-title {
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
 }
 
-/* 스텝 */
-.step {
-  transition: opacity 0.2s;
+.content { padding: 8px 0 48px; }
+
+.line-sep {
+  height: 1px;
+  background: var(--separator);
+  margin: 8px 0;
 }
 
-.step.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
+.step { padding: 16px 16px 8px; }
+.step.disabled { opacity: 0.4; pointer-events: none; }
 
-.step-label {
+.step-head {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-.step-number {
-  width: 28px;
-  height: 28px;
+.step-num {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--primary);
   color: #fff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -275,111 +228,52 @@ async function submit() {
   transition: background 0.2s;
 }
 
-.step-number.done {
-  background: var(--success);
-}
+.step-num.done { background: var(--success); }
 
-.step-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
+.step-label { font-size: 15px; font-weight: 600; }
 
-/* 위치 카드 */
-.location-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  text-align: center;
-}
+.step-body { padding-left: 36px; }
 
-.location-card.has-location {
-  border-color: var(--success);
-  background: var(--success-light);
-  text-align: left;
-}
+.loc-empty { display: flex; flex-direction: column; gap: 10px; }
+.loc-hint { font-size: 13px; color: var(--text-secondary); }
 
-.location-hint {
-  font-size: 13px;
-  color: var(--text-hint);
-  margin-bottom: 14px;
-}
-
-.btn-location {
+.btn-loc {
   background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
-  padding: 13px 24px;
-  font-size: 15px;
+  border-radius: 12px;
+  padding: 11px 18px;
+  font-size: 14px;
   font-weight: 600;
-  width: 100%;
+  align-self: flex-start;
+  transition: opacity 0.15s;
 }
 
-.btn-location:hover:not(:disabled) {
-  background: var(--primary-dark);
-}
+.btn-loc:disabled { opacity: 0.3; cursor: not-allowed; }
 
-.btn-location:disabled {
-  background: var(--text-hint);
-  cursor: not-allowed;
-}
+.loc-result { display: flex; flex-direction: column; gap: 8px; }
 
-.location-result {
+.loc-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.location-row {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
   font-size: 13px;
 }
 
-.location-label {
-  color: var(--text-hint);
-}
+.loc-key { color: var(--text-secondary); }
+.loc-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+.loc-ok { font-size: 13px; font-weight: 600; color: var(--success); }
 
-.location-value {
-  font-weight: 600;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.location-ok {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--success);
-  margin-top: 4px;
-}
-
-.btn-relocate {
+.btn-relo {
   background: none;
-  border: 1px solid var(--success);
-  color: var(--success);
-  border-radius: var(--radius-sm);
-  padding: 7px 14px;
-  font-size: 13px;
-  align-self: flex-start;
-  margin-top: 4px;
-}
-
-/* 폼 카드 */
-.form-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  align-self: flex-start;
 }
 
-.field {
-  margin-bottom: 18px;
-}
+.field-group { margin-bottom: 18px; }
 
 .field-label {
   display: block;
@@ -389,117 +283,73 @@ async function submit() {
   margin-bottom: 7px;
 }
 
-.required {
-  color: var(--error);
-}
+.req { color: var(--error); }
 
-.input, .textarea {
+.field {
   width: 100%;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 11px 14px;
+  background: var(--primary-light);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
   font-size: 14px;
-  background: var(--bg);
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: background 0.15s;
 }
 
-.input:focus, .textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
-  background: var(--surface);
-}
+.field:focus { background: #EBEBEB; }
+.field::placeholder { color: var(--text-hint); }
+.ta { height: 80px; resize: none; line-height: 1.5; }
 
-.input::placeholder, .textarea::placeholder {
-  color: var(--text-hint);
-}
-
-.textarea {
-  height: 90px;
-  resize: none;
-  line-height: 1.6;
-}
-
-/* 반경 옵션 */
-.radius-options {
+.radius-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
-.radius-option {
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
+.radius-opt {
+  border: 1.5px solid var(--separator);
+  border-radius: 10px;
   padding: 10px 6px;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+  transition: border-color 0.15s;
 }
 
-.radius-option.selected {
+.radius-opt.selected {
   border-color: var(--primary);
   background: var(--primary-light);
 }
 
-.radius-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
+.r-label { font-size: 13px; font-weight: 700; }
+.r-desc { font-size: 11px; color: var(--text-hint); }
 
-.radius-option.selected .radius-name {
-  color: var(--primary);
-}
-
-.radius-desc {
-  font-size: 11px;
-  color: var(--text-hint);
-}
-
-/* 등록 버튼 */
 .btn-submit {
   width: 100%;
   background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   padding: 14px;
   font-size: 15px;
   font-weight: 600;
-  margin-top: 4px;
+  transition: opacity 0.15s;
 }
 
-.btn-submit:hover:not(:disabled) {
-  background: var(--primary-dark);
-}
-
-.btn-submit:disabled {
-  background: var(--text-hint);
-  cursor: not-allowed;
-}
-
-/* 에러 */
-.error-msg {
-  color: var(--error);
-  font-size: 13px;
-  margin-top: 10px;
-  background: var(--error-light);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  text-align: center;
-}
+.btn-submit:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .step-placeholder {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 20px;
-  border: 1.5px dashed var(--border);
   font-size: 13px;
   color: var(--text-hint);
-  text-align: center;
+  padding: 4px 0;
+}
+
+.err {
+  font-size: 13px;
+  color: var(--error);
+  margin-top: 8px;
 }
 </style>
