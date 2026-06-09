@@ -1,2 +1,5 @@
 .env
 *.exe
+/design_handoff_herenote_sns
+/.idea
+/.claude
