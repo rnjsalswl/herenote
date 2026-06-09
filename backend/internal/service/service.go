@@ -6,6 +6,7 @@ import (
     "time"
 
     "github.com/google/uuid"
+    jwtauth "github.com/herenote/backend/internal/auth"
     "github.com/herenote/backend/internal/model"
     "github.com/herenote/backend/internal/repository"
     "golang.org/x/crypto/bcrypt"
@@ -106,11 +107,12 @@ func (s *GuestbookService) UserGuestbooks(ctx context.Context, userID, placeID s
 
 // 유저
 type UserService struct {
-    repo *repository.UserRepository
+    repo      *repository.UserRepository
+    jwtSecret string
 }
 
-func NewUserService(r *repository.UserRepository) *UserService {
-    return &UserService{repo: r}
+func NewUserService(r *repository.UserRepository, jwtSecret string) *UserService {
+    return &UserService{repo: r, jwtSecret: jwtSecret}
 }
 
 func (s *UserService) Create(ctx context.Context, req *model.CreateUserRequest) (*model.AuthResponse, error) {
@@ -124,11 +126,16 @@ func (s *UserService) Create(ctx context.Context, req *model.CreateUserRequest) 
         return nil, err
     }
 
+    token, err := jwtauth.Sign(user.ID, user.Nickname, s.jwtSecret)
+    if err != nil {
+        return nil, fmt.Errorf("토큰 발급 실패: %w", err)
+    }
+
     return &model.AuthResponse{
-        ID: user.ID,
-        Nickname: user.Nickname,
+        ID:        user.ID,
+        Nickname:  user.Nickname,
         BadgeType: user.BadgeType,
-        Token: user.ID, // JWT 교체 예정
+        Token:     token,
     }, nil
 }
 
@@ -142,11 +149,16 @@ func (s *UserService) Login(ctx context.Context, req *model.LoginRequest) (*mode
         return nil, fmt.Errorf("닉네임 또는 비밀번호가 올바르지 않습니다.")
     }
 
+    token, err := jwtauth.Sign(user.ID, user.Nickname, s.jwtSecret)
+    if err != nil {
+        return nil, fmt.Errorf("토큰 발급 실패: %w", err)
+    }
+
     return &model.AuthResponse{
-        ID: user.ID,
-        Nickname: user.Nickname,
+        ID:        user.ID,
+        Nickname:  user.Nickname,
         BadgeType: user.BadgeType,
-        Token: user.ID,
+        Token:     token,
     }, nil
 }
 

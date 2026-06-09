@@ -37,7 +37,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import HnIcon from '@/components/HnIcon.vue'
 import { API } from '@/config.js'
-import { setUserID } from '@/stores/user.js'
+import { setToken } from '@/stores/user.js'
 const router = useRouter()
 const mode = ref('register')
 const modes = [['register','처음 왔어요'],['login','돌아왔어요']]
@@ -51,7 +51,7 @@ async function submit() {
   const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nickname: nickname.value.trim(), password: password.value }) })
   if (res.ok) {
     const data = await res.json()
-    setUserID(mode.value === 'login' ? data.user_id : data.id)
+    setToken(data.token)
     router.push('/')
   } else {
     const data = await res.json().catch(() => ({}))

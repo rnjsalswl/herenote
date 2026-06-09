@@ -82,9 +82,9 @@ type CreateGuestbookRequest struct {
 
 // 위치 인증
 type VerifyRequest struct {
-    Latitude float64 `json:"latitude"   binding:"required"`
+    Latitude  float64 `json:"latitude"  binding:"required"`
     Longitude float64 `json:"longitude" binding:"required"`
-    UserID string `json:"user_id"   binding:"required"`
+    UserID    string  `json:"user_id"`  // JWT 미들웨어에서 주입; 없으면 body 값 사용
 }
 
 type VerifyResponse struct {

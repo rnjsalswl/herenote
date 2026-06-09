@@ -3,16 +3,18 @@ package config
 import "os"
 
 type Config struct {
-    Port string
+    Port        string
     DatabaseURL string
     AdminSecret string
+    JWTSecret   string
 }
 
 func Load() *Config {
     return &Config{
-        Port:           getEnv("PORT", "8088"),
-        DatabaseURL:    getEnv("DATABASE_URL",""),
-        AdminSecret:    getEnv("ADMIN_SECRET", "herenote-admin"),
+        Port:        getEnv("PORT", "8088"),
+        DatabaseURL: getEnv("DATABASE_URL", ""),
+        AdminSecret: getEnv("ADMIN_SECRET", "herenote-admin"),
+        JWTSecret:   getEnv("JWT_SECRET", "herenote-dev-secret-change-in-prod"),
     }
 }
 

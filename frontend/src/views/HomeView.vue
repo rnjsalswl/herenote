@@ -60,6 +60,7 @@ import HnNoteCard from '@/components/HnNoteCard.vue'
 import HnSectionLabel from '@/components/HnSectionLabel.vue'
 import { API } from '@/config.js'
 import { getUserID } from '@/stores/user.js'
+import { authFetch } from '@/stores/api.js'
 import { lastVerifiedId } from '@/stores/verified.js'
 
 const router = useRouter()
@@ -80,7 +81,7 @@ onMounted(async () => {
   const uid = getUserID()
   if (uid) {
     try {
-      const res = await fetch(`${API}/users/${uid}/guestbooks/places`)
+      const res = await authFetch(`${API}/users/${uid}/guestbooks/places`)
       const data = await res.json()
       myPlaces.value = data.places || []
     } catch {}

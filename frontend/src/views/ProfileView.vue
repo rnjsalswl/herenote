@@ -69,12 +69,13 @@ import HnAvatar from '@/components/HnAvatar.vue'
 import HnMapThumb from '@/components/HnMapThumb.vue'
 import HnSectionLabel from '@/components/HnSectionLabel.vue'
 import { API } from '@/config.js'
-import { getUserID, clearUser } from '@/stores/user.js'
+import { getUserID, clearUser, getNickname } from '@/stores/user.js'
+import { authFetch } from '@/stores/api.js'
 import { lastVerifiedId } from '@/stores/verified.js'
 
 const router = useRouter()
 const userId = getUserID() || ''
-const nickname = userId || '나'
+const nickname = getNickname() || userId || '나'
 const myPlaces = ref([])
 const loadingPlaces = ref(true)
 const visitCount = ref(0)
@@ -86,7 +87,7 @@ function seedOf(id) { return id ? id.charCodeAt(0) + (id.charCodeAt(1)||0) : 1 }
 onMounted(async () => {
   if (userId) {
     try {
-      const res = await fetch(`${API}/users/${userId}/guestbooks/places`)
+      const res = await authFetch(`${API}/users/${userId}/guestbooks/places`)
       const data = await res.json()
       myPlaces.value = data.places || []
       visitCount.value = myPlaces.value.length

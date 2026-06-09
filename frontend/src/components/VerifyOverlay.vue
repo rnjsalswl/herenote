@@ -45,7 +45,7 @@ import { ref, onMounted } from 'vue'
 import HnIcon from './HnIcon.vue'
 import HnPill from './HnPill.vue'
 import { API } from '@/config.js'
-import { getUserID } from '@/stores/user.js'
+import { authFetch } from '@/stores/api.js'
 
 const props = defineProps({ place: Object })
 const emit = defineEmits(['done', 'close'])
@@ -56,10 +56,10 @@ onMounted(() => {
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
       try {
-        const res = await fetch(`${API}/places/${props.place.id}/verify`, {
+        const res = await authFetch(`${API}/places/${props.place.id}/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude: pos.coords.latitude, longitude: pos.coords.longitude, user_id: getUserID() }),
+          body: JSON.stringify({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
         })
         const data = await res.json()
         if (data.verified) {
