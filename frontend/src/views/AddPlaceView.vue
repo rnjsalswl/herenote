@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <header class="topbar">
-      <button class="back-btn" @click="router.push('/')">
+      <button class="back-btn" @click="goBack">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <polyline points="15 18 9 12 15 6"/>
         </svg>
@@ -97,6 +97,8 @@ import { API } from '@/config.js'
 
 const router = useRouter()
 const ADMIN_SECRET = 'herenote-admin'
+
+function goBack() { router.push('/') }
 
 const location = ref(null)
 const locating = ref(false)
