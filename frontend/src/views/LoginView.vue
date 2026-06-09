@@ -51,7 +51,7 @@ async function submit() {
   const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nickname: nickname.value.trim(), password: password.value }) })
   if (res.ok) {
     const data = await res.json()
-    setToken(data.token)
+    if (data.token) setToken(data.token)
     router.push('/')
   } else {
     const data = await res.json().catch(() => ({}))

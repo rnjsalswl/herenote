@@ -226,9 +226,5 @@ func (h *UserHandler) Login(c *gin.Context) {
         c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
         return
     }
-    c.JSON(http.StatusOK, model.LoginResponse{
-        UserID:    user.ID,
-        Nickname:  user.Nickname,
-        BadgeType: user.BadgeType,
-    })
+    c.JSON(http.StatusOK, user) // AuthResponse — token 포함
 }

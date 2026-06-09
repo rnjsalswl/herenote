@@ -102,14 +102,14 @@ import HnAvatar from '@/components/HnAvatar.vue'
 import HnBadge from '@/components/HnBadge.vue'
 import HnMapThumb from '@/components/HnMapThumb.vue'
 import { API } from '@/config.js'
-import { getUserID } from '@/stores/user.js'
+import { getUserID, getNickname } from '@/stores/user.js'
 import { authFetch } from '@/stores/api.js'
 
 const route = useRoute()
 const router = useRouter()
 
 const USER_ID = getUserID()
-const nickname = USER_ID || '나'
+const nickname = getNickname() || USER_ID || '나'
 const mineMode = computed(() => route.query.mine === 'true')
 const displayedGuestbooks = computed(() =>
   mineMode.value ? guestbooks.value.filter(g => g.user_id === USER_ID) : guestbooks.value
