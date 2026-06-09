@@ -100,6 +100,10 @@ func (s *GuestbookService) MyPlaces(ctx context.Context, userID string) ([]model
     return s.repo.FindMyPlaces(ctx, userID)
 }
 
+func (s *GuestbookService) UserGuestbooks(ctx context.Context, userID, placeID string) ([]model.Guestbook, error) {
+    return s.repo.FindByUserAndPlace(ctx, userID, placeID)
+}
+
 // 유저
 type UserService struct {
     repo *repository.UserRepository
@@ -110,7 +114,6 @@ func NewUserService(r *repository.UserRepository) *UserService {
 }
 
 func (s *UserService) Create(ctx context.Context, req *model.CreateUserRequest) (*model.AuthResponse, error) {
-    // 비밀번호 암호화
     hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
     if err != nil {
         return nil, err

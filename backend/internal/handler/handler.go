@@ -127,7 +127,7 @@ func (h *GuestbookHandler) Create(c *gin.Context) {
 
     // 미들웨어에서 주입된 값
     userID := c.GetString("user_id")
-    badgeType := model.BadgeType(c.GetString("badgeType"))
+    badgeType := model.BadgeType(c.GetString("badge_type"))
 
     gb, err := h.svc.Create(c.Request.Context(), c.Param("id"), userID, &req, badgeType)
     if err != nil {
@@ -135,6 +135,16 @@ func (h *GuestbookHandler) Create(c *gin.Context) {
         return
     }
     c.JSON(http.StatusCreated, gb)
+}
+
+// GET /api/users/:userId/places/:placeId/guestbooks
+func (h *GuestbookHandler) UserGuestbooks(c *gin.Context) {
+    list, err := h.svc.UserGuestbooks(c.Request.Context(), c.Param("userId"), c.Param("placeId"))
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"guestbooks": list})
 }
 
 // GET /api/users/:id/guestbooks/places
