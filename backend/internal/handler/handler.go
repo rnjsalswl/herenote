@@ -24,6 +24,15 @@ func (h *AuthHandler) Verify(c *gin.Context) {
         return
     }
 
+    // JWT 미들웨어가 주입한 user_id 우선, 없으면 body 값 사용
+    if jwtUserID := c.GetString("user_id"); jwtUserID != "" {
+        req.UserID = jwtUserID
+    }
+    if req.UserID == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "user_id가 필요합니다."})
+        return
+    }
+
     resp, err := h.svc.Verify(c.Request.Context(), c.Param("id"), &req)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

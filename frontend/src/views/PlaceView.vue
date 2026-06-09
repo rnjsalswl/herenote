@@ -103,6 +103,7 @@ import HnBadge from '@/components/HnBadge.vue'
 import HnMapThumb from '@/components/HnMapThumb.vue'
 import { API } from '@/config.js'
 import { getUserID } from '@/stores/user.js'
+import { authFetch } from '@/stores/api.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -140,13 +141,12 @@ async function verify() {
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
       try {
-        const res = await fetch(`${API}/places/${route.params.id}/verify`, {
+        const res = await authFetch(`${API}/places/${route.params.id}/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
-            user_id: USER_ID,
           }),
         })
         const data = await res.json()

@@ -38,7 +38,7 @@ func main() {
     placeService := service.NewPlaceService(placeRepo)
     guestbookService := service.NewGuestbookService(guestbookRepo, sessionRepo)
     authService := service.NewAuthService(sessionRepo, placeRepo)
-    userService := service.NewUserService(userRepo)
+    userService := service.NewUserService(userRepo, cfg.JWTSecret)
 
     // Handler
     placeHandler := handler.NewPlaceHandler(placeService)
@@ -52,8 +52,8 @@ func main() {
 
     api := r.Group("/api")
     {
-        // 위치 인증
-        api.POST("/places/:id/verify", authHandler.Verify)
+        // 위치 인증 (JWT 필요)
+        api.POST("/places/:id/verify", middleware.UserAuth(cfg.JWTSecret), authHandler.Verify)
 
         // 장소
         api.GET("/places", placeHandler.List)
@@ -67,8 +67,10 @@ func main() {
             auth.GET("", guestbookHandler.List)
             auth.POST("", guestbookHandler.Create)
         }
-        api.GET("/users/:id/guestbooks/places", guestbookHandler.MyPlaces)
-        api.GET("/users/:id/places/:placeId/guestbooks", guestbookHandler.UserGuestbooks)
+        // 유저별 방명록 (JWT 필요)
+        userAuth := api.Group("", middleware.UserAuth(cfg.JWTSecret))
+        userAuth.GET("/users/:id/guestbooks/places", guestbookHandler.MyPlaces)
+        userAuth.GET("/users/:id/places/:placeId/guestbooks", guestbookHandler.UserGuestbooks)
 
         // 유저
         api.POST("/users", userHandler.Create)
