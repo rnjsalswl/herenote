@@ -14,18 +14,18 @@
       <h2>📍 지금 여기</h2>
       <div v-if="locating" class="loading">위치 확인 중...</div>
       <div v-else-if="nearbyPlaces.length > 0">
-        <div
+        <RouterLink
           v-for="place in nearbyPlaces"
           :key="place.id"
+          :to="`/places/${place.id}`"
           class="place-card nearby"
-          @click="goToPlace(place.id)"
         >
           <div class="place-info">
             <span class="place-name">{{ place.name }}</span>
             <span class="place-desc">{{ place.description }}</span>
           </div>
           <span class="arrow">→</span>
-        </div>
+        </RouterLink>
       </div>
       <div v-else class="empty">근처에 등록된 장소가 없어요</div>
     </div>
@@ -34,18 +34,18 @@
     <div class="section">
       <h2>🗺 내가 다녀간 곳</h2>
       <div v-if="myPlaces.length > 0">
-        <div
+        <RouterLink
           v-for="place in myPlaces"
           :key="place.id"
+          :to="{ path: `/places/${place.id}`, query: { mine: 'true' } }"
           class="place-card"
-          @click="router.push({ path: `/places/${place.id}`, query: { mine: 'true' } })"
         >
           <div class="place-info">
             <span class="place-name">{{ place.name }}</span>
             <span class="place-desc">{{ place.description }}</span>
           </div>
           <span class="arrow">→</span>
-        </div>
+        </RouterLink>
       </div>
       <div v-else class="empty">아직 방명록을 남긴 장소가 없어요</div>
     </div>
@@ -90,10 +90,6 @@ onMounted(async () => {
     }
   )
 })
-
-function goToPlace(id) {
-  router.push(`/places/${id}`)
-}
 
 function logout() {
   clearUser()
@@ -155,6 +151,8 @@ h2 {
 }
 .place-card {
   display: flex;
+  text-decoration: none;
+  color: inherit;
   align-items: center;
   justify-content: space-between;
   border: 1px solid #eee;
