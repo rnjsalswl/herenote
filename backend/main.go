@@ -68,7 +68,7 @@ func main() {
             auth.POST("", guestbookHandler.Create)
         }
         api.GET("/users/:id/guestbooks/places", guestbookHandler.MyPlaces)
-        api.GET("/users/:userId/places/:placeId/guestbooks", guestbookHandler.UserGuestbooks)
+        api.GET("/users/:id/places/:placeId/guestbooks", guestbookHandler.UserGuestbooks)
 
         // 유저
         api.POST("/users", userHandler.Create)

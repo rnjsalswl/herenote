@@ -89,10 +89,12 @@ const content = ref('')
 const writing = ref(false)
 
 onMounted(async () => {
-  const res = await fetch(`${API}/places/${route.params.id}`)
-  place.value = await res.json()
-  loading.value = false
-
+  try {
+    const res = await fetch(`${API}/places/${route.params.id}`)
+    place.value = await res.json()
+  } finally {
+    loading.value = false
+  }
   verify()
 })
 
@@ -100,22 +102,25 @@ async function verify() {
   verifying.value = true
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
-      const res = await fetch(`${API}/places/${route.params.id}/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          user_id: USER_ID,
-        }),
-      })
-      const data = await res.json()
-      if (data.verified) {
-        verified.value = true
-        token.value = data.token
-        await loadGuestbooks()
+      try {
+        const res = await fetch(`${API}/places/${route.params.id}/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            user_id: USER_ID,
+          }),
+        })
+        const data = await res.json()
+        if (data.verified) {
+          verified.value = true
+          token.value = data.token
+          await loadGuestbooks()
+        }
+      } finally {
+        verifying.value = false
       }
-      verifying.value = false
     },
     () => {
       verifying.value = false
