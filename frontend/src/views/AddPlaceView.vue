@@ -1,90 +1,101 @@
 <template>
-  <div class="page">
-    <header class="topbar">
-      <button class="back-btn" @click="goBack">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-      </button>
-      <span class="topbar-title">장소 추가</span>
-      <div style="width:36px" />
-    </header>
+  <div style="min-height:100vh;background:var(--bg)">
+    <HnTopBar title="장소 추가" :on-back="goBack"/>
 
-    <div class="content">
+    <div style="padding:8px 16px 48px">
       <!-- STEP 1 -->
-      <div class="step">
-        <div class="step-head">
-          <div class="step-num" :class="{ done: !!location }">{{ location ? '✓' : '1' }}</div>
-          <span class="step-label">현재 위치 가져오기</span>
+      <div style="padding:16px 0 8px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div :style="{
+            width:'26px', height:'26px', borderRadius:'50%', flexShrink:0,
+            background: location ? 'var(--ink)' : 'var(--surface-2)',
+            color: location ? 'var(--inv-ink)' : 'var(--ink-2)',
+            border:'1px solid var(--line)',
+            fontSize:'12px', fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center',
+          }">
+            <HnIcon v-if="location" name="check" :size="14" :stroke="3"/>
+            <span v-else>1</span>
+          </div>
+          <span style="font-size:15px;font-weight:700;color:var(--ink)">현재 위치 가져오기</span>
         </div>
 
-        <div class="step-body">
-          <div v-if="!location" class="loc-empty">
-            <p class="loc-hint">버튼을 눌러 현재 위치를 장소 좌표로 등록하세요</p>
-            <button class="btn-loc" @click="getLocation" :disabled="locating">
-              {{ locating ? '가져오는 중...' : '📍 현재 위치 가져오기' }}
+        <div style="padding-left:36px">
+          <div v-if="!location" style="display:flex;flex-direction:column;gap:10px">
+            <p style="font-size:13px;color:var(--ink-2)">버튼을 눌러 현재 위치를 장소 좌표로 등록하세요</p>
+            <button @click="getLocation" :disabled="locating" :style="{
+              alignSelf:'flex-start', padding:'10px 18px', borderRadius:'12px', border:'none',
+              background:'var(--ink)', color:'var(--inv-ink)', fontSize:'14px', fontWeight:600, cursor:'pointer',
+              opacity: locating ? 0.5 : 1, transition:'opacity .15s',
+            }">
+              <span style="display:flex;align-items:center;gap:7px">
+                <HnIcon name="pin" :size="16" :stroke="2.2"/>
+                {{ locating ? '가져오는 중...' : '현재 위치 가져오기' }}
+              </span>
             </button>
-            <p v-if="locationError" class="err">{{ locationError }}</p>
+            <p v-if="locationError" style="font-size:13px;color:var(--ink-2)">{{ locationError }}</p>
           </div>
 
-          <div v-else class="loc-result">
-            <div class="loc-row">
-              <span class="loc-key">위도</span>
-              <span class="loc-val">{{ location.latitude.toFixed(6) }}</span>
+          <div v-else style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)">
+              <span style="color:var(--ink-2)">위도</span>
+              <span style="font-weight:600;font-family:var(--font-mono)">{{ location.latitude.toFixed(6) }}</span>
             </div>
-            <div class="loc-row">
-              <span class="loc-key">경도</span>
-              <span class="loc-val">{{ location.longitude.toFixed(6) }}</span>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)">
+              <span style="color:var(--ink-2)">경도</span>
+              <span style="font-weight:600;font-family:var(--font-mono)">{{ location.longitude.toFixed(6) }}</span>
             </div>
-            <div class="loc-ok">✓ 위치 준비됨</div>
-            <button class="btn-relo" @click="getLocation" :disabled="locating">다시 가져오기</button>
+            <button @click="getLocation" :disabled="locating" style="align-self:flex-start;padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink-2);font-size:13px;cursor:pointer">다시 가져오기</button>
           </div>
         </div>
       </div>
 
-      <div class="line-sep" />
+      <div style="height:1px;background:var(--line);margin:8px 0"/>
 
       <!-- STEP 2 -->
-      <div class="step" :class="{ disabled: !location }">
-        <div class="step-head">
-          <div class="step-num">2</div>
-          <span class="step-label">장소 정보 입력</span>
+      <div :style="{padding:'16px 0 8px', opacity: location ? 1 : 0.4, pointerEvents: location ? 'auto' : 'none'}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
+          <span style="font-size:15px;font-weight:700;color:var(--ink)">장소 정보 입력</span>
         </div>
 
-        <div class="step-body" v-if="location">
-          <div class="field-group">
-            <label class="field-label">장소 이름 <span class="req">*</span></label>
-            <input v-model="form.name" class="field" placeholder="예: 경복궁 정문" />
+        <div v-if="location" style="padding-left:36px;display:flex;flex-direction:column;gap:16px">
+          <div>
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px">장소 이름 <span style="color:var(--ink)">*</span></label>
+            <input v-model="form.name" :style="fieldStyle" placeholder="예: 경복궁 정문"/>
           </div>
 
-          <div class="field-group">
-            <label class="field-label">장소 설명</label>
-            <textarea v-model="form.description" class="field ta" placeholder="이 장소에 대해 설명해주세요" />
+          <div>
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px">장소 설명</label>
+            <textarea v-model="form.description" :style="{...fieldStyle, height:'80px', resize:'none', lineHeight:'1.5'}" placeholder="이 장소에 대해 설명해주세요"/>
           </div>
 
-          <div class="field-group">
-            <label class="field-label">인증 반경</label>
-            <div class="radius-grid">
-              <label
-                v-for="opt in radiusOptions"
-                :key="opt.value"
-                class="radius-opt"
-                :class="{ selected: form.radius_meters === opt.value }"
-              >
-                <input type="radio" :value="opt.value" v-model="form.radius_meters" style="display:none" />
-                <span class="r-label">{{ opt.label }}</span>
-                <span class="r-desc">{{ opt.desc }}</span>
+          <div>
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px">인증 반경</label>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <label v-for="opt in radiusOptions" :key="opt.value" :style="{
+                border: form.radius_meters===opt.value ? '2px solid var(--ink)' : '1.5px solid var(--line)',
+                borderRadius:'12px', padding:'10px 6px', textAlign:'center', cursor:'pointer',
+                display:'flex', flexDirection:'column', gap:'2px',
+                background: form.radius_meters===opt.value ? 'var(--surface-2)' : 'transparent',
+                transition:'all .15s',
+              }">
+                <input type="radio" :value="opt.value" v-model="form.radius_meters" style="display:none"/>
+                <span style="font-size:13px;font-weight:700;color:var(--ink)">{{ opt.label }}</span>
+                <span style="font-size:11px;color:var(--ink-3)">{{ opt.desc }}</span>
               </label>
             </div>
           </div>
 
-          <button class="btn-submit" @click="submit" :disabled="submitting || !form.name.trim()">
-            {{ submitting ? '등록 중...' : '장소 등록하기' }}
-          </button>
-          <p v-if="submitError" class="err">{{ submitError }}</p>
+          <button @click="submit" :disabled="submitting || !form.name.trim()" :style="{
+            padding:'14px', borderRadius:'14px', border:'none',
+            background:'var(--ink)', color:'var(--inv-ink)', fontSize:'15px', fontWeight:700,
+            cursor: form.name.trim() ? 'pointer' : 'not-allowed',
+            opacity: form.name.trim() ? 1 : 0.3, transition:'opacity .15s',
+          }">{{ submitting ? '등록 중...' : '장소 등록하기' }}</button>
+          <p v-if="submitError" style="font-size:13px;color:var(--ink-2);text-align:center">{{ submitError }}</p>
         </div>
 
-        <div v-else class="step-placeholder">위치를 먼저 가져와주세요</div>
+        <div v-else style="padding-left:36px;font-size:13px;color:var(--ink-3)">위치를 먼저 가져와주세요</div>
       </div>
     </div>
   </div>
@@ -93,6 +104,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import HnTopBar from '@/components/HnTopBar.vue'
+import HnIcon from '@/components/HnIcon.vue'
 import { API } from '@/config.js'
 
 const router = useRouter()
@@ -114,6 +127,12 @@ const radiusOptions = [
 const form = ref({ name: '', description: '', radius_meters: 100 })
 const submitting = ref(false)
 const submitError = ref('')
+
+const fieldStyle = {
+  width:'100%', boxSizing:'border-box', padding:'12px 14px', borderRadius:'12px',
+  border:'1px solid var(--line)', background:'var(--surface-2)', color:'var(--ink)',
+  fontSize:'14px', fontFamily:'var(--font-sans)', outline:'none',
+}
 
 function getLocation() {
   locating.value = true
@@ -152,206 +171,3 @@ async function submit() {
   submitting.value = false
 }
 </script>
-
-<style scoped>
-.page {
-  max-width: 600px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: #fff;
-}
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--separator);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 8px;
-  height: 52px;
-}
-
-.back-btn {
-  background: none;
-  border: none;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: var(--text-primary);
-}
-
-.back-btn:active { background: var(--primary-light); }
-
-.topbar-title {
-  font-size: 16px;
-  font-weight: 600;
-  flex: 1;
-  text-align: center;
-}
-
-.content { padding: 8px 0 48px; }
-
-.line-sep {
-  height: 1px;
-  background: var(--separator);
-  margin: 8px 0;
-}
-
-.step { padding: 16px 16px 8px; }
-.step.disabled { opacity: 0.4; pointer-events: none; }
-
-.step-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.step-num {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.2s;
-}
-
-.step-num.done { background: var(--success); }
-
-.step-label { font-size: 15px; font-weight: 600; }
-
-.step-body { padding-left: 36px; }
-
-.loc-empty { display: flex; flex-direction: column; gap: 10px; }
-.loc-hint { font-size: 13px; color: var(--text-secondary); }
-
-.btn-loc {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 11px 18px;
-  font-size: 14px;
-  font-weight: 600;
-  align-self: flex-start;
-  transition: opacity 0.15s;
-}
-
-.btn-loc:disabled { opacity: 0.3; cursor: not-allowed; }
-
-.loc-result { display: flex; flex-direction: column; gap: 8px; }
-
-.loc-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-}
-
-.loc-key { color: var(--text-secondary); }
-.loc-val { font-weight: 600; font-variant-numeric: tabular-nums; }
-.loc-ok { font-size: 13px; font-weight: 600; color: var(--success); }
-
-.btn-relo {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  align-self: flex-start;
-}
-
-.field-group { margin-bottom: 18px; }
-
-.field-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 7px;
-}
-
-.req { color: var(--error); }
-
-.field {
-  width: 100%;
-  background: var(--primary-light);
-  border: none;
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-size: 14px;
-  color: var(--text-primary);
-  outline: none;
-  transition: background 0.15s;
-}
-
-.field:focus { background: #EBEBEB; }
-.field::placeholder { color: var(--text-hint); }
-.ta { height: 80px; resize: none; line-height: 1.5; }
-
-.radius-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.radius-opt {
-  border: 1.5px solid var(--separator);
-  border-radius: 10px;
-  padding: 10px 6px;
-  text-align: center;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  transition: border-color 0.15s;
-}
-
-.radius-opt.selected {
-  border-color: var(--primary);
-  background: var(--primary-light);
-}
-
-.r-label { font-size: 13px; font-weight: 700; }
-.r-desc { font-size: 11px; color: var(--text-hint); }
-
-.btn-submit {
-  width: 100%;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 15px;
-  font-weight: 600;
-  transition: opacity 0.15s;
-}
-
-.btn-submit:disabled { opacity: 0.3; cursor: not-allowed; }
-
-.step-placeholder {
-  font-size: 13px;
-  color: var(--text-hint);
-  padding: 4px 0;
-}
-
-.err {
-  font-size: 13px;
-  color: var(--error);
-  margin-top: 8px;
-}
-</style>
