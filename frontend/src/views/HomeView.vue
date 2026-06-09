@@ -3,7 +3,7 @@
     <header class="topbar">
       <span class="topbar-title">HERE NOTE</span>
       <div class="topbar-actions">
-        <button class="icon-btn" @click="router.push('/add-place')">
+        <button class="icon-btn" @click="goToAddPlace">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
@@ -102,6 +102,8 @@ onMounted(async () => {
     () => { locating.value = false }
   )
 })
+
+function goToAddPlace() { router.push('/add-place') }
 
 function logout() {
   clearUser()
