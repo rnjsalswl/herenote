@@ -13,7 +13,7 @@
       <HnAvatar :name="nickname" :size="72" :filled="true"/>
       <div style="flex:1;min-width:0">
         <div style="font-family:var(--font-display);font-weight:var(--disp-weight);font-size:20px;letter-spacing:var(--disp-ls);color:var(--ink)">{{ nickname }}</div>
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:4px">ID · {{ userId }}</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:4px">@{{ nickname }}</div>
         <div style="display:flex;gap:8px;margin-top:10px">
           <HnPill mono><HnIcon name="pin" :size="11" :stroke="2.2"/> {{ visitCount }}곳 방문</HnPill>
           <HnPill mono><HnIcon name="bolt" :size="11" :stroke="2.2"/> {{ noteCount }}개 방명록</HnPill>
