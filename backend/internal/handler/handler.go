@@ -139,7 +139,7 @@ func (h *GuestbookHandler) Create(c *gin.Context) {
 
 // GET /api/users/:userId/places/:placeId/guestbooks
 func (h *GuestbookHandler) UserGuestbooks(c *gin.Context) {
-    list, err := h.svc.UserGuestbooks(c.Request.Context(), c.Param("userId"), c.Param("placeId"))
+    list, err := h.svc.UserGuestbooks(c.Request.Context(), c.Param("id"), c.Param("placeId"))
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
