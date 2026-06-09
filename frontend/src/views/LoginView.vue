@@ -7,18 +7,39 @@
     </div>
 
     <div class="login-card">
-      <p class="form-title">닉네임으로 시작하기</p>
-      <input
-        v-model="nickname"
-        class="input"
-        placeholder="닉네임 입력 (최대 20자)"
-        maxlength="20"
-        @keyup.enter="submit"
-      />
-      <button class="btn-primary" @click="submit" :disabled="submitting || !nickname.trim()">
-        {{ submitting ? '시작하는 중...' : '시작하기 →' }}
-      </button>
-      <p v-if="error" class="error-msg">{{ error }}</p>
+      <!-- 탭 -->
+      <div class="tabs">
+        <button class="tab" :class="{ active: mode === 'register' }" @click="switchMode('register')">회원가입</button>
+        <button class="tab" :class="{ active: mode === 'login' }" @click="switchMode('login')">로그인</button>
+      </div>
+
+      <div class="form">
+        <div class="field">
+          <label class="field-label">닉네임</label>
+          <input
+            v-model="nickname"
+            class="input"
+            placeholder="닉네임 입력 (최대 20자)"
+            maxlength="20"
+            @keyup.enter="submit"
+          />
+        </div>
+        <div class="field">
+          <label class="field-label">비밀번호</label>
+          <input
+            v-model="password"
+            class="input"
+            type="password"
+            :placeholder="mode === 'register' ? '비밀번호 (4자 이상)' : '비밀번호 입력'"
+            @keyup.enter="submit"
+          />
+        </div>
+
+        <button class="btn-primary" @click="submit" :disabled="submitting || !canSubmit">
+          {{ submitting ? '처리 중...' : mode === 'register' ? '가입하기 →' : '로그인 →' }}
+        </button>
+        <p v-if="error" class="error-msg">{{ error }}</p>
+      </div>
     </div>
 
     <p class="footer-note">장소에 직접 방문해야 방명록을 볼 수 있어요</p>
@@ -26,25 +47,40 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { API } from '@/config.js'
 import { setUserID } from '@/stores/user.js'
 
 const router = useRouter()
+const mode = ref('register')
 const nickname = ref('')
+const password = ref('')
 const submitting = ref(false)
 const error = ref('')
 
+const canSubmit = computed(() =>
+  nickname.value.trim().length > 0 && password.value.length >= 4
+)
+
+function switchMode(m) {
+  mode.value = m
+  error.value = ''
+}
+
 async function submit() {
-  if (!nickname.value.trim()) return
+  if (!canSubmit.value) return
   submitting.value = true
   error.value = ''
 
-  const res = await fetch(`${API}/users`, {
+  const url = mode.value === 'register' ? `${API}/users` : `${API}/auth/login`
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nickname: nickname.value.trim() }),
+    body: JSON.stringify({
+      nickname: nickname.value.trim(),
+      password: password.value,
+    }),
   })
 
   if (res.ok) {
@@ -52,7 +88,8 @@ async function submit() {
     setUserID(data.id)
     router.push('/')
   } else {
-    error.value = '오류가 발생했습니다. 다시 시도해주세요.'
+    const data = await res.json().catch(() => ({}))
+    error.value = data.error || '오류가 발생했습니다. 다시 시도해주세요.'
   }
   submitting.value = false
 }
@@ -91,7 +128,6 @@ async function submit() {
 .brand-sub {
   color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
-  font-weight: 400;
 }
 
 .login-card {
@@ -99,30 +135,64 @@ async function submit() {
   max-width: 380px;
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 28px 24px;
+  overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
 
-.form-title {
-  font-size: 15px;
+/* 탭 */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-hint);
+  cursor: pointer;
+  transition: color 0.15s, border-bottom 0.15s;
+  border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* 폼 */
+.form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
-  margin-bottom: 14px;
-  text-align: center;
 }
 
 .input {
   width: 100%;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 13px 16px;
+  padding: 12px 14px;
   font-size: 15px;
   background: var(--bg);
   color: var(--text-primary);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
-  text-align: center;
-  margin-bottom: 12px;
 }
 
 .input:focus {
@@ -144,7 +214,7 @@ async function submit() {
   padding: 14px;
   font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  margin-top: 4px;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -160,7 +230,6 @@ async function submit() {
   color: var(--error);
   font-size: 13px;
   text-align: center;
-  margin-top: 10px;
   background: var(--error-light);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
