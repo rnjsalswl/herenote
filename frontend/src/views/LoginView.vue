@@ -85,7 +85,7 @@ async function submit() {
 
   if (res.ok) {
     const data = await res.json()
-    setUserID(data.id)
+    setUserID(mode.value === 'login' ? data.user_id : data.id)
     router.push('/')
   } else {
     const data = await res.json().catch(() => ({}))
