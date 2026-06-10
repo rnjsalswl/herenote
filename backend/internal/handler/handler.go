@@ -156,6 +156,16 @@ func (h *GuestbookHandler) UserGuestbooks(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"guestbooks": list})
 }
 
+// GET /api/users/:id/stats
+func (h *GuestbookHandler) Stats(c *gin.Context) {
+    visited, notes, err := h.svc.Stats(c.Request.Context(), c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"visited": visited, "notes": notes})
+}
+
 // GET /api/users/:id/guestbooks/places
 func (h *GuestbookHandler) MyPlaces(c *gin.Context) {
     places, err := h.svc.MyPlaces(c.Request.Context(), c.Param("id"))

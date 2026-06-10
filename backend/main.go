@@ -69,6 +69,7 @@ func main() {
         }
         // 유저별 방명록 (JWT 필요)
         userAuth := api.Group("", middleware.UserAuth(cfg.JWTSecret))
+        userAuth.GET("/users/:id/stats", guestbookHandler.Stats)
         userAuth.GET("/users/:id/guestbooks/places", guestbookHandler.MyPlaces)
         userAuth.GET("/users/:id/places/:placeId/guestbooks", guestbookHandler.UserGuestbooks)
 

@@ -101,6 +101,13 @@ func (r *GuestbookRepository) FindByUserAndPlace(ctx context.Context, userID, pl
     return list, nil
 }
 
+// 유저가 작성한 방명록 수
+func (r *GuestbookRepository) CountByUser(ctx context.Context, userID string) (int, error) {
+    var count int
+    err := r.db.QueryRow(ctx, `SELECT COUNT(*) FROM guestbooks WHERE user_id = $1`, userID).Scan(&count)
+    return count, err
+}
+
 // 내가 작성한 방명록의 장소 목록 (최근순, 장소 중복 제거)
 func (r *GuestbookRepository) FindMyPlaces(ctx context.Context, userID string) ([]model.Place, error) {
     rows, err := r.db.Query(ctx, `

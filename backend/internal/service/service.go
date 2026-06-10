@@ -105,6 +105,15 @@ func (s *GuestbookService) UserGuestbooks(ctx context.Context, userID, placeID s
     return s.repo.FindByUserAndPlace(ctx, userID, placeID)
 }
 
+func (s *GuestbookService) Stats(ctx context.Context, userID string) (visited, notes int, err error) {
+    places, e := s.repo.FindMyPlaces(ctx, userID)
+    if e != nil {
+        return 0, 0, e
+    }
+    notes, e = s.repo.CountByUser(ctx, userID)
+    return len(places), notes, e
+}
+
 // 유저
 type UserService struct {
     repo      *repository.UserRepository
