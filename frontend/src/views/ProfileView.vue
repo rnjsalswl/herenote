@@ -87,10 +87,15 @@ function seedOf(id) { return id ? id.charCodeAt(0) + (id.charCodeAt(1)||0) : 1 }
 onMounted(async () => {
   if (userId) {
     try {
-      const res = await authFetch(`${API}/users/${userId}/guestbooks/places`)
-      const data = await res.json()
-      myPlaces.value = data.places || []
-      visitCount.value = myPlaces.value.length
+      const [placesRes, statsRes] = await Promise.all([
+        authFetch(`${API}/users/${userId}/guestbooks/places`),
+        authFetch(`${API}/users/${userId}/stats`),
+      ])
+      const placesData = await placesRes.json()
+      const statsData = await statsRes.json()
+      myPlaces.value = placesData.places || []
+      visitCount.value = statsData.visited ?? myPlaces.value.length
+      noteCount.value = statsData.notes ?? 0
     } catch {}
   }
   loadingPlaces.value = false
