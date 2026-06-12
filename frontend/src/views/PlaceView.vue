@@ -7,7 +7,14 @@
     <div v-else>
       <!-- 장소 헤더 -->
       <div style="padding:0 16px 16px">
-        <HnMapThumb :seed="seedOf(place.id)" :radius="place.radius_meters" :height="160" :rounded="true"/>
+        <HnKakaoMap
+          :lat="place.latitude"
+          :lng="place.longitude"
+          :radius="place.radius_meters"
+          :zoom="4"
+          :height="160"
+          :rounded="true"
+        />
         <div style="margin-top:14px">
           <h1 style="font-family:var(--font-display);font-weight:var(--disp-weight);font-size:22px;letter-spacing:var(--disp-ls);color:var(--ink);margin:0 0 6px">{{ place.name }}</h1>
           <p v-if="place.description" style="font-size:14px;color:var(--ink-2);margin:0 0 10px;line-height:1.5">{{ place.description }}</p>
@@ -100,7 +107,7 @@ import HnIcon from '@/components/HnIcon.vue'
 import HnPill from '@/components/HnPill.vue'
 import HnAvatar from '@/components/HnAvatar.vue'
 import HnBadge from '@/components/HnBadge.vue'
-import HnMapThumb from '@/components/HnMapThumb.vue'
+import HnKakaoMap from '@/components/HnKakaoMap.vue'
 import { API } from '@/config.js'
 import { getUserID, getNickname } from '@/stores/user.js'
 import { authFetch } from '@/stores/api.js'
@@ -123,8 +130,6 @@ const token = ref('')
 const guestbooks = ref([])
 const content = ref('')
 const writing = ref(false)
-
-function seedOf(id) { return id ? id.charCodeAt(0) + (id.charCodeAt(1)||0) : 1 }
 
 onMounted(async () => {
   try {
