@@ -6,15 +6,14 @@
       </template>
     </HnTopBar>
 
-    <!-- 지도 플레이스홀더 -->
-    <div style="position:relative;margin:12px 16px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)">
-      <HnMapThumb :seed="42" :radius="500" :height="260" :rounded="false" :show-pin="false" label="지도 준비 중"/>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--bg) 60%, transparent);backdrop-filter:blur(4px)">
-        <div style="text-align:center;padding:20px">
-          <div style="font-family:var(--font-display);font-weight:var(--disp-weight);font-size:17px;letter-spacing:var(--disp-ls);color:var(--ink);margin-bottom:6px">지도 기능 준비 중</div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3)">COMING SOON</div>
-        </div>
-      </div>
+    <!-- 카카오맵 -->
+    <div style="margin:12px 16px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)">
+      <HnKakaoMap
+        :places="places"
+        :zoom="6"
+        :height="260"
+        @marker-click="p => router.push(`/places/${p.id}`)"
+      />
     </div>
 
     <!-- 장소 목록 -->
@@ -32,7 +31,15 @@
         borderBottom:'1px solid var(--line)', textDecoration:'none', color:'inherit',
       }">
         <div style="width:46px;height:46px;border-radius:14px;overflow:hidden;flex-shrink:0">
-          <HnMapThumb :seed="seedOf(p.id)" :radius="p.radius_meters" :height="46" :rounded="false" :show-pin="false"/>
+          <HnMapThumb
+            :lat="p.latitude"
+            :lng="p.longitude"
+            :seed="seedOf(p.id)"
+            :radius="p.radius_meters"
+            :height="46"
+            :rounded="false"
+            :show-pin="false"
+          />
         </div>
         <div style="flex:1;min-width:0">
           <div style="font-weight:700;font-size:15px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.name }}</div>
@@ -59,6 +66,7 @@
     <HnTabBar active="explore" @tab="goTab" @compose="goCompose" style="position:fixed;bottom:0;left:0;right:0"/>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -67,6 +75,7 @@ import HnTabBar from '@/components/HnTabBar.vue'
 import HnIcon from '@/components/HnIcon.vue'
 import HnPill from '@/components/HnPill.vue'
 import HnMapThumb from '@/components/HnMapThumb.vue'
+import HnKakaoMap from '@/components/HnKakaoMap.vue'
 import HnSectionLabel from '@/components/HnSectionLabel.vue'
 import { API } from '@/config.js'
 import { lastVerifiedId } from '@/stores/verified.js'

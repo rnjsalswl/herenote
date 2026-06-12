@@ -36,6 +36,16 @@
           </div>
 
           <div v-else style="display:flex;flex-direction:column;gap:8px">
+            <!-- 위치 미리보기 지도 -->
+            <div style="border-radius:12px;overflow:hidden;border:1px solid var(--line)">
+              <HnKakaoMap
+                :lat="location.latitude"
+                :lng="location.longitude"
+                :zoom="3"
+                :height="160"
+                :places="[{ id:'me', latitude: location.latitude, longitude: location.longitude }]"
+              />
+            </div>
             <div style="display:flex;justify-content:space-between;font-size:13px;padding:10px 12px;background:var(--surface-2);border-radius:10px;border:1px solid var(--line)">
               <span style="color:var(--ink-2)">위도</span>
               <span style="font-weight:600;font-family:var(--font-mono)">{{ location.latitude.toFixed(6) }}</span>
@@ -106,6 +116,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import HnTopBar from '@/components/HnTopBar.vue'
 import HnIcon from '@/components/HnIcon.vue'
+import HnKakaoMap from '@/components/HnKakaoMap.vue'
 import { API } from '@/config.js'
 
 const router = useRouter()
