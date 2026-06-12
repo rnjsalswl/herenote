@@ -11,7 +11,7 @@ export function loadKakaoSDK() {
     sdkLoading = true
 
     const script = document.createElement('script')
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_JS_KEY}&autoload=false`
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.KAKAO_JS_KEY}&autoload=false`
     script.onload = () => {
       window.kakao.maps.load(() => {
         sdkLoaded = true
