@@ -50,7 +50,7 @@ const props = defineProps({
 })
 
 const imgError = ref(false)
-const REST_KEY = import.meta.env.KAKAO_REST_KEY
+const REST_KEY = import.meta.env.VITE_KAKAO_REST_KEY
 
 // 반경에 따른 줌 레벨 계산 (카카오 level: 1=소, 14=대)
 const zoomLevel = computed(() => {
