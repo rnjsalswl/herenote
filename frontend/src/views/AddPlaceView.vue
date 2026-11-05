@@ -118,9 +118,9 @@ import HnTopBar from '@/components/HnTopBar.vue'
 import HnIcon from '@/components/HnIcon.vue'
 import HnKakaoMap from '@/components/HnKakaoMap.vue'
 import { API } from '@/config.js'
+import { authFetch } from '@/stores/api.js'
 
 const router = useRouter()
-const ADMIN_SECRET = 'herenote-admin'
 
 function goBack() { router.push('/') }
 
@@ -163,9 +163,9 @@ function getLocation() {
 async function submit() {
   submitting.value = true
   submitError.value = ''
-  const res = await fetch(`${API}/admin/places`, {
+  const res = await authFetch(`${API}/admin/places`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': ADMIN_SECRET },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       name: form.value.name,
       description: form.value.description,
@@ -176,6 +176,8 @@ async function submit() {
   })
   if (res.ok) {
     router.push('/')
+  } else if (res.status === 401 || res.status === 403) {
+    submitError.value = '관리자 계정으로 로그인해야 장소를 등록할 수 있습니다.'
   } else {
     submitError.value = '등록에 실패했습니다. 다시 시도해주세요.'
   }
