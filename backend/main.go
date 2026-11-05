@@ -19,7 +19,13 @@ func main() {
     }
 
     // 설정 로드
-    cfg := config.Load()
+    cfg, err := config.Load()
+    if err != nil {
+        log.Fatalf("설정 오류: %v", err)
+    }
+    if len(cfg.AdminUserIDs) == 0 {
+        log.Println("ADMIN_USER_IDS 미설정 - 어드민 API는 모두 거부됩니다")
+    }
 
     // DB 연결
     db, err := repository.NewDB(cfg.DatabaseURL)
@@ -80,7 +86,7 @@ func main() {
 
         // 어드민
         admin := api.Group("/admin")
-        admin.Use(middleware.AdminAuth(cfg.AdminSecret))
+        admin.Use(middleware.UserAuth(cfg.JWTSecret), middleware.AdminOnly(cfg.AdminUserIDs))
         {
             admin.POST("/places", placeHandler.Create)
             admin.POST("/badges/:userId", userHandler.GrantBadge)
