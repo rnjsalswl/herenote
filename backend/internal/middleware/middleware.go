@@ -15,7 +15,7 @@ func CORS() gin.HandlerFunc {
     return func(c *gin.Context) {
         c.Header("Access-Control-Allow-Origin", "*")
         c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Location-Token, X-Admin-Secret")
+        c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Location-Token")
         if c.Request.Method == "OPTIONS" {
             c.AbortWithStatus(http.StatusNoContent)
             return
@@ -76,11 +76,13 @@ func LocationAuth(sessionRepo *repository.SessionRepository) gin.HandlerFunc {
     }
 }
 
-// AdminAuth - 어드민 API 보호
-func AdminAuth(secret string) gin.HandlerFunc {
+// AdminOnly - 어드민 API 보호
+// UserAuth 뒤에 붙여서 사용. JWT로 확인된 user_id가 관리자 목록에 있어야 통과.
+// (공유 시크릿 헤더 방식은 프론트 번들에 값이 노출되므로 사용하지 않음)
+func AdminOnly(adminIDs map[string]bool) gin.HandlerFunc {
     return func(c *gin.Context) {
-        if c.GetHeader("X-Admin-Secret") != secret {
-            c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+        if !adminIDs[c.GetString("user_id")] {
+            c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
                 "error": "관리자 권한이 없습니다.",
             })
             return
