@@ -4,7 +4,9 @@
 
 산 정상, 공원, 카페 같은 장소마다 방명록이 있고, GPS로 현장에 있다는 게 확인돼야만 그곳에 남겨진 글을 열람하고 새 글을 남길 수 있습니다.
 
-<!-- TODO: 스크린샷 또는 GIF (홈 / 장소 상세 / 위치 인증 / 방명록 작성) -->
+🔗 **서비스:** https://herenote.vercel.app  ·  📐 **설계 문서:** [docs/DESIGN.md](docs/DESIGN.md)
+
+<img src="docs/images/login-mobile.png" alt="herenote 시작 화면" width="280">
 
 ## 주요 기능
 
