@@ -78,23 +78,43 @@ func (s *PlaceService) FindNearby(ctx context.Context, lat, lng float64) ([]mode
 }
 
 // 방명록
-type GuestbookService struct {
-    repo *repository.GuestbookRepository
-    sessionRepo *repository.SessionRepository
+// userFinder는 작성자의 현재 뱃지를 DB에서 읽기 위한 최소 인터페이스입니다.
+type userFinder interface {
+    FindByID(ctx context.Context, id string) (*model.User, error)
 }
 
-func NewGuestbookService(g *repository.GuestbookRepository, s *repository.SessionRepository) *GuestbookService {
-    return &GuestbookService{repo: g, sessionRepo: s}
+type GuestbookService struct {
+    repo        *repository.GuestbookRepository
+    sessionRepo *repository.SessionRepository
+    users       userFinder
+}
+
+func NewGuestbookService(g *repository.GuestbookRepository, s *repository.SessionRepository, u userFinder) *GuestbookService {
+    return &GuestbookService{repo: g, sessionRepo: s, users: u}
 }
 
 func (s *GuestbookService) List(ctx context.Context, placeID string) ([]model.Guestbook, error) {
     return s.repo.ListByPlace(ctx, placeID)
 }
 
-func (s *GuestbookService) Create(ctx context.Context, placeID, userID string, req *model.CreateGuestbookRequest, badgeType model.BadgeType) (*model.Guestbook, error) {
-    // 뱃지 보유자는 자동 상단 고정
-    isPinned := badgeType != model.BadgeNone
-    return s.repo.Create(ctx, placeID, userID, req, isPinned)
+func (s *GuestbookService) Create(ctx context.Context, placeID, userID string, req *model.CreateGuestbookRequest) (*model.Guestbook, error) {
+    // 뱃지 보유자는 자동 상단 고정.
+    // 예전에는 위치 인증 미들웨어가 넘겨준 badge_type을 썼는데, 미들웨어가 항상
+    // NONE을 넣고 있어서 고정이 한 번도 동작하지 않았다. 작성 시점에 DB에서 직접 읽는다.
+    return s.repo.Create(ctx, placeID, userID, req, s.shouldPin(ctx, userID))
+}
+
+// shouldPin은 작성자가 뱃지를 갖고 있는지 확인합니다.
+// 조회에 실패하면 글 작성은 막지 않고 고정만 하지 않습니다.
+func (s *GuestbookService) shouldPin(ctx context.Context, userID string) bool {
+    if s.users == nil || userID == "" {
+        return false
+    }
+    u, err := s.users.FindByID(ctx, userID)
+    if err != nil || u == nil {
+        return false
+    }
+    return u.BadgeType != "" && u.BadgeType != model.BadgeNone
 }
 
 func (s *GuestbookService) MyPlaces(ctx context.Context, userID string) ([]model.Place, error) {

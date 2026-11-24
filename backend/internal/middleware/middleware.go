@@ -6,7 +6,6 @@ import (
 
     "github.com/gin-gonic/gin"
     jwtauth "github.com/herenote/backend/internal/auth"
-    "github.com/herenote/backend/internal/model"
     "github.com/herenote/backend/internal/repository"
 )
 
@@ -71,7 +70,6 @@ func LocationAuth(sessionRepo *repository.SessionRepository) gin.HandlerFunc {
 
         c.Set("user_id", session.UserID)
         c.Set("place_id", session.PlaceID)
-        c.Set("badge_type", string(model.BadgeNone))
         c.Next()
     }
 }

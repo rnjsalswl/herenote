@@ -43,7 +43,7 @@ func main() {
 
     // service
     placeService := service.NewPlaceService(placeRepo)
-    guestbookService := service.NewGuestbookService(guestbookRepo, sessionRepo)
+    guestbookService := service.NewGuestbookService(guestbookRepo, sessionRepo, userRepo)
     authService := service.NewAuthService(sessionRepo, placeRepo)
     userService := service.NewUserService(userRepo, cfg.JWTSecret)
 

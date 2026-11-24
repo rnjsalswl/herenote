@@ -136,9 +136,8 @@ func (h *GuestbookHandler) Create(c *gin.Context) {
 
     // 미들웨어에서 주입된 값
     userID := c.GetString("user_id")
-    badgeType := model.BadgeType(c.GetString("badge_type"))
 
-    gb, err := h.svc.Create(c.Request.Context(), c.Param("id"), userID, &req, badgeType)
+    gb, err := h.svc.Create(c.Request.Context(), c.Param("id"), userID, &req)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
