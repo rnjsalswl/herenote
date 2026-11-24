@@ -11,6 +11,7 @@ type Config struct {
     DatabaseURL  string
     JWTSecret    string
     AdminUserIDs map[string]bool // 관리자 권한을 가진 유저 ID 목록
+    KakaoRestKey string          // 카카오 REST 키 (서버 전용, 정적 지도 프록시에 사용)
 }
 
 // Load는 환경변수에서 설정을 읽습니다.
@@ -21,6 +22,7 @@ func Load() (*Config, error) {
         DatabaseURL:  os.Getenv("DATABASE_URL"),
         JWTSecret:    os.Getenv("JWT_SECRET"),
         AdminUserIDs: parseList(os.Getenv("ADMIN_USER_IDS")),
+        KakaoRestKey: os.Getenv("KAKAO_REST_KEY"),
     }
 
     if len(cfg.JWTSecret) < 32 {

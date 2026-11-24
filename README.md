@@ -86,7 +86,7 @@ frontend/src/
 
 ```bash
 cd backend
-cp .env.example .env   # DATABASE_URL, JWT_SECRET(32자 이상), ADMIN_USER_IDS 입력
+cp .env.example .env   # DATABASE_URL, JWT_SECRET(32자 이상), ADMIN_USER_IDS, KAKAO_REST_KEY 입력
 go run .
 ```
 
@@ -94,7 +94,7 @@ go run .
 
 ```bash
 cd frontend
-cp .env.example .env   # KAKAO_JS_KEY, KAKAO_REST_KEY 입력
+cp .env.example .env   # KAKAO_JS_KEY 입력 (REST 키는 백엔드에만 둠)
 npm install
 npm run dev
 ```

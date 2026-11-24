@@ -37,6 +37,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import HnIcon from './HnIcon.vue'
+import { API } from '@/config.js'
 
 const props = defineProps({
   lat: { type: Number, default: null },
@@ -50,7 +51,6 @@ const props = defineProps({
 })
 
 const imgError = ref(false)
-const REST_KEY = import.meta.env.VITE_KAKAO_REST_KEY
 
 // 반경에 따른 줌 레벨 계산 (카카오 level: 1=소, 14=대)
 const zoomLevel = computed(() => {
@@ -66,7 +66,8 @@ const staticUrl = computed(() => {
   if (!props.lat || !props.lng) return ''
   const w = 400
   const h = Math.max(200, props.height * 2)
-  return `https://dapi.kakao.com/v2/maps/staticmap?appkey=${REST_KEY}&center=${props.lng},${props.lat}&level=${zoomLevel.value}&size=${w}x${h}&markers=color:red%7C${props.lng},${props.lat}`
+  // 카카오 REST 키는 서버에만 있음. 이미지는 백엔드 프록시를 거쳐서 받음
+  return `${API}/static-map?lat=${props.lat}&lng=${props.lng}&level=${zoomLevel.value}&w=${w}&h=${h}`
 })
 
 function r(n) { const x = Math.sin(props.seed*9301+n*49297)*233280; return x-Math.floor(x) }

@@ -9,6 +9,7 @@ import (
     "github.com/herenote/backend/internal/middleware"
     "github.com/herenote/backend/internal/repository"
     "github.com/herenote/backend/internal/service"
+    "github.com/herenote/backend/pkg/staticmap"
     "github.com/joho/godotenv"
 )
 
@@ -60,6 +61,9 @@ func main() {
     {
         // 위치 인증 (JWT 필요)
         api.POST("/places/:id/verify", middleware.UserAuth(cfg.JWTSecret), authHandler.Verify)
+
+        // 카카오 정적 지도 프록시 (REST 키를 브라우저에 노출하지 않기 위해 서버에서 대신 요청)
+        api.GET("/static-map", gin.WrapF(staticmap.Handler(cfg.KakaoRestKey, nil)))
 
         // 장소
         api.GET("/places", placeHandler.List)
