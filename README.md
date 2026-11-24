@@ -22,8 +22,8 @@
 
 | 영역 | 사용 기술 |
 |---|---|
-| Backend | Go, Gin, pgx (PostgreSQL), PostGIS, golang-jwt, bcrypt |
-| Frontend | Vue 3 (Composition API), Vue Router, Vite, vite-plugin-pwa |
+| 백엔드 | Go, Gin, pgx (PostgreSQL), PostGIS, golang-jwt, bcrypt |
+| 프론트엔드 | Vue 3 (Composition API), Vue Router, Vite, vite-plugin-pwa |
 | 외부 API | Kakao Maps JS SDK, Kakao Static Map |
 | 배포 | Railway |
 
@@ -82,7 +82,7 @@ frontend/src/
 
 ## 로컬 실행
 
-**Backend** (Go 1.26+, PostgreSQL + PostGIS)
+**백엔드** (Go 1.26+, PostgreSQL + PostGIS)
 
 ```bash
 cd backend
@@ -90,7 +90,7 @@ cp .env.example .env   # DATABASE_URL, JWT_SECRET(32자 이상), ADMIN_USER_IDS,
 go run .
 ```
 
-**Frontend** (Node 20.19+)
+**프론트엔드** (Node 20.19+)
 
 ```bash
 cd frontend
