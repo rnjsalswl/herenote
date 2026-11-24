@@ -6,7 +6,7 @@
 
 🔗 **서비스:** https://herenote.vercel.app  ·  📐 **설계 문서:** [docs/DESIGN.md](docs/DESIGN.md)
 
-<img src="docs/images/login-mobile.png" alt="herenote 시작 화면" width="280">
+<img src="docs/images/herenote-home.jpg" alt="홈" width="240"> <img src="docs/images/herenote-map.jpg" alt="지도 탐색" width="240"> <img src="docs/images/herenote-place.jpg" alt="장소 상세" width="240">
 
 ## 주요 기능
 
